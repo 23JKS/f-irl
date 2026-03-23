@@ -1,0 +1,64 @@
+# 使用预训练奖励函数训练SAC的配置文件
+# SAC参数尽量与 configs/samples/agents/hopper.yml 保持一致
+
+seed: 1
+cuda: -1
+
+env:
+  env_name: HopperFH-v0
+  T: 1000  # 最大回合长度
+  state_indices: all  # 使用所有状态维度
+
+reward:
+  # ========== 重要：指定预训练的奖励模型路径 ==========
+  pretrained: /home/qu/f-IRL/logs/HopperFH-v0/exp-16/fkl/1/2026_03_11_15_02_01/model/reward_model_itr290_det3447_sto3426.pkl
+
+  # 奖励网络结构（需要与预训练模型一致）
+  use_bn: false
+  residual: false
+  hid_act: relu
+  hidden_sizes: [64, 64]
+  clamp_magnitude: 10
+
+  # 以下参数在使用预训练模型时通常不会更新，但需要保留以匹配模型配置
+  lr: 1e-4
+  weight_decay: 1e-3
+  gradient_step: 1
+  momentum: 0.9
+
+sac:
+  # ========== 重要：训练总步数 ==========
+  # 原IRL训练: 300次迭代 × 5个epoch = 1500个epoch
+  epochs: 1500
+
+  # ========== 重要：设置为false以使用学到的奖励 ==========
+  reinitialize: True
+
+  # 以下参数与 configs/samples/agents/hopper.yml 尽量一致
+  k: 1
+  log_step_interval: 5000
+  update_every: 1
+  random_explore_episodes: 1
+  update_num: 1
+  batch_size: 100
+  lr: 1e-3
+  alpha: 0.2
+  automatic_alpha_tuning: false
+  buffer_size: 1000000
+  num_test_episodes: 10
+  roer:
+    lambda_: 0.01
+    beta: 0.4
+    clip_min: 10.0
+    clip_max: 100.0
+  gumbel_max_clip: 7.0
+
+  # 预训练策略（可选）
+  # pretrained: logs/HopperFH-v0/exp-16/fkl/1/YOUR_RUN/model/policy_model_xxx.pkl
+
+irl:
+  # 评估参数，尽量与 IRL 配置一致
+  eval_episodes: 20
+  training_trajs: 32
+  expert_episodes: 16
+  resample_episodes: 10

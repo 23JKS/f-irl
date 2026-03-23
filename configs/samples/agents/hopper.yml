@@ -1,0 +1,104 @@
+obj: fkl
+IS: false
+seed: 1
+cuda: -1
+env:
+  env_name: HopperFH-v0
+  T: 1000
+  state_indices: all
+irl:
+  training_trajs: 32
+  n_itrs: 300
+  save_interval: 0
+  eval_episodes: 20
+  expert_episodes: 16
+  resample_episodes: 10
+bc:
+  epochs: 10000
+  eval_freq: 100
+  eval_episodes: 20
+  expert_episodes: 16
+sac:
+  k: 1
+  epochs: 5
+  log_step_interval: 5000
+  update_every: 1
+  random_explore_episodes: 1
+  update_num: 1
+  batch_size: 100
+  lr: 1e-3
+  alpha: 0.2
+  automatic_alpha_tuning: false
+  buffer_size: 1000000
+  num_test_episodes: 10
+  reinitialize: false
+  # ROER 参数（可选，如果不存在则使用默认值）
+  roer:
+    lambda_: 0.01      # ROER 平滑参数 λ，范围通常 [0, 1]
+    beta: 0.4     # KL 温度 β，控制 TD error 的缩放
+    clip_min: 10.0      # 优先级下界，防止优先级过小
+    clip_max: 100.0     # 优先级上界，防止优先级过大
+  # Gumbel rescale loss 参数（用于后 20% 迭代的 V 网络训练）
+  # 注意：gumbel_alpha 使用 roer.beta 的值，不需要单独设置
+  gumbel_max_clip: 7.0  # Gumbel rescale loss 的 clip 值
+reward:
+  use_bn: false
+  residual: false
+  hid_act: relu
+  hidden_sizes: [64, 64]
+  clamp_magnitude: 10
+  lr: 1e-4
+  weight_decay: 1e-3
+  gradient_step: 1
+  momentum: 0.9
+disc:
+  reinit: false
+  model_type: resnet_disc
+  num_layer_blocks: 3
+  hid_dim: 128
+  hid_act: tanh
+  use_bn: false
+  clamp_magnitude: 10.0
+  batch_size: 800
+  lr: 0.0003
+  weight_decay: 0.0001
+  momentum: 0.9
+  iter: 500
+critic:
+  lam: 0.5
+  model_type: resnet_disc
+  num_layer_blocks: 3
+  hid_dim: 128
+  hid_act: tanh
+  use_bn: false
+  batch_size: 800
+  lr: 0.0003
+  weight_decay: 0.0001
+  momentum: 0.0
+  iter: 1200
+adv_irl: # https://github.com/KamyarGh/rl_swiss/blob/master/exp_specs/adv_irl.yaml
+  normalize: true
+  num_epochs: 100
+  num_steps_per_epoch: 100000
+  num_steps_between_train_calls: 1000
+  min_steps_before_training: 5000
+  num_update_loops_per_train_call: 100
+  num_disc_updates_per_loop_iter: 1
+  num_policy_updates_per_loop_iter: 1
+  disc_optim_batch_size: 256
+  policy_optim_batch_size: 256
+  disc_lr: 0.0003
+  disc_momentum: 0.0
+  use_grad_pen: true
+  grad_pen_weight: 4.0  # [2.0, 4.0, 8.0, 16.0]
+  reward_scale: 0.2  # [2.0, 4.0, 8.0, 16.0]
+  save_interval: 0
+  eval_interval: 200
+  replay_buffer_size: 200000
+  disc:
+    model_type: mlp_disc
+    num_layer_blocks: 2
+    hid_dim: 128
+    hid_act: tanh
+    use_bn: false
+    clamp_magnitude: 10.0

@@ -1,0 +1,58 @@
+# SAC 配置（Ant 环境，启用 ROER 优先级重加权）
+seed: 1
+cuda: 0
+
+env:
+  env_name: AntFH-v0
+  T: 1000
+  state_indices: all
+
+reward:
+  pretrained: /home/qu/f-IRL/logs/AntFH-v0/exp-16/fkl/1/2026_03_08_09_05_40/model/reward_model_itr433_det5709_sto5259.pkl
+  use_bn: false
+  residual: false
+  hid_act: relu
+  hidden_sizes: [128, 128]
+  clamp_magnitude: 10
+  lr: 0.0001
+  weight_decay: 0.001
+  gradient_step: 1
+  momentum: 0.9
+  anchor_lambda: 0.05
+
+sac:
+  # 基本训练设置
+  epochs: 3000
+  reinitialize: True
+  k: 1
+  log_step_interval: 5000
+  update_every: 1
+  random_explore_episodes: 1
+  update_num: 1
+  batch_size: 100
+  lr: 0.001
+  alpha: 0.2
+  automatic_alpha_tuning: true
+  buffer_size: 1000000
+  num_test_episodes: 20
+
+  # 启用 ROER 机制
+  enable_roer_priority: true
+  # ROER 超参数（可在实验中调整）
+  roer:
+    lambda_: 0.01      # ROER 平滑参数 λ，范围通常 [0, 1]
+    beta: 2     # KL 温度 β，控制 TD error 的缩放
+    clip_min: 10.0      # 优先级下界，防止优先级过小
+    clip_max: 100.0     # 优先级上界，防止优先级过大
+  # Gumbel rescale loss 参数（用于后 20% 迭代的 V 网络训练）
+  # 注意：gumbel_alpha 使用 roer.beta 的值，不需要单独设置
+  gumbel_max_clip: 7.0  # Gumbel rescale loss 的 clip 值
+ 
+  # 可选：预训练策略路径（如果需要）
+  # pretrained: logs/AntFH-v0/.../policy_model.pth
+
+irl:
+  eval_episodes: 20
+  training_trajs: 32
+  expert_episodes: 16
+  resample_episodes: 0

@@ -1,0 +1,59 @@
+# 使用预训练奖励函数训练SAC的配置文件
+# SAC参数与 configs/samples/agents/ant.yml 保持一致
+
+seed: 1
+cuda: 0
+
+env:
+  env_name: AntFH-v0
+  T: 1000  # 最大回合长度
+  state_indices: all  # 使用所有状态维度
+
+reward:
+  # ========== 重要：指定预训练的奖励模型路径 ==========
+  pretrained: /home/qu/f-IRL/logs/AntFH-v0/exp-16/fkl/1/2026_03_08_09_05_40/model/reward_model_itr433_det5709_sto5259.pkl
+  
+  # 奖励网络结构（需要与预训练模型一致）
+  use_bn: false
+  residual: false
+  hid_act: relu
+  hidden_sizes: [128, 128]
+  clamp_magnitude: 10
+  
+  # 以下参数在使用预训练模型时不会用到，但需要保留
+  lr: 0.0001
+  weight_decay: 0.001
+  gradient_step: 1
+  momentum: 0.9
+  anchor_lambda: 0.05
+
+sac:
+  # ========== 重要：增加训练轮数 ==========
+  # 原IRL训练: 700次迭代 × 5个epoch = 3500个epoch
+  epochs: 3000
+  
+  # ========== 重要：设置为false以使用学到的奖励 ==========
+  reinitialize: True
+  
+  # 以下参数与 configs/samples/agents/ant.yml 完全一致
+  k: 1
+  log_step_interval: 5000
+  update_every: 1
+  random_explore_episodes: 1
+  update_num: 1
+  batch_size: 100
+  lr: 0.001
+  alpha: 0.2
+  automatic_alpha_tuning: true  # 开启自动调整（原配置是false，但true更好）
+  buffer_size: 1000000
+  num_test_episodes: 10
+  
+  # 预训练策略（可选）
+  # pretrained: logs/AntFH-v0/exp-16/fkl/1/2026_03_05_09_13_01/model/policy_model_itr201_det5274_sto4133.pkl
+
+irl:
+  # 评估参数
+  eval_episodes: 20  # 评估时运行的回合数
+  training_trajs: 32  # 收集用于评估的轨迹数
+  expert_episodes: 16  # 专家轨迹数（用于记录）
+  resample_episodes: 0  # 不需要重采样

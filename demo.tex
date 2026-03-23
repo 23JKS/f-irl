@@ -1,0 +1,126 @@
+\documentclass[a4paper,12pt]{article}
+
+% --- 宏包设置 ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amsthm} % 数学公式必备
+\usepackage{geometry}                 % 页面边距
+\usepackage{graphicx}                 % 插入图片
+\usepackage{hyperref}                 % 超链接
+\usepackage{booktabs}                 % 表格三线表
+\usepackage{algorithm}                % 算法环境
+\usepackage{algpseudocode}            % 算法伪代码
+\usepackage{ctex}                     % 【关键】支持中文
+
+% 页面设置
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% 自定义命令 (方便写公式)
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\norm}[1]{\left\| #1 \right\|}
+\newcommand{\trans}{^T}
+
+% 标题信息
+\title{\textbf{文献研读报告：基于神经网络的在线最优控制设计}\\ \large Policy Iteration and Online NN-Based Control for HJB Equations}
+\author{你的姓名 \\ 学号/职位}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    本报告整理并分析了关于求解哈密顿 - 雅可比 - 贝尔曼 (HJB) 方程的两种主要方法：传统的策略迭代算法 (Policy Iteration) 与基于神经网络的在线控制算法。报告重点阐述了传统算法对初始容许控制的依赖及其离线计算的局限性，并详细推导了利用单层神经网络在紧集上逼近价值函数的数学原理。通过引入评价网络 (Critic NN) 和自适应律，该方法实现了无需初始容许控制的在线最优策略求解。
+    
+    \vspace{0.5em}
+    \noindent\textbf{关键词：} 最优控制，HJB 方程，策略迭代，神经网络，自适应动态规划，紧集
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{引言}
+在非线性系统的最优控制问题中，核心挑战在于求解哈密顿 - 雅可比 - 贝尔曼 (Hamilton-Jacobi-Bellman, HJB) 方程。由于 HJB 方程通常是一个非线性的偏微分方程，解析解极难获得。传统的数值方法（如策略迭代）虽然有效，但往往需要离线计算且依赖严格的初始条件。本文献提出了一种基于神经网络 (NN) 的在线近似方法，利用神经网络的万能逼近性质，在紧集 $\Omega$ 上实现价值函数和控制策略的实时逼近。
+
+\section{传统策略迭代算法 (Policy Iteration)}
+
+\subsection{算法流程}
+文献中提出的策略迭代算法旨在通过迭代方式逼近最优价值函数 $V^*(x)$ 和最优控制 $u^*(x)$。具体步骤如下：
+
+\begin{algorithm}[H]
+\caption{策略迭代算法 (Policy Iteration Algorithm)}
+\begin{algorithmic}[1]
+\State \textbf{输入:} 计算精度 $\epsilon > 0$, 初始迭代 $j=0$, $V^{(0)}(x)=0$.
+\State \textbf{初始化:} 选择一个初始容许控制策略 $u^{(0)}(x)$.
+\Repeat
+    \State \textbf{策略评估 (Policy Evaluation):} 求解以下方程获取 $V^{(j+1)}(x)$:
+    \begin{equation}
+        (V^{(j+1)}_x)\trans [f(x) + g(x)u^{(j)}] + d_M^2(x) + x\trans Q x - 2\kappa \sum \int \dots = 0
+    \end{equation}
+    \State \textbf{策略改进 (Policy Improvement):} 更新控制律:
+    \begin{equation}
+        u^{(j+1)}(x) = -\kappa \tanh \left( \frac{1}{2\kappa} g\trans(x) V^{(j+1)}_x \right)
+    \end{equation}
+    \State $j \leftarrow j + 1$
+\Until{$|V^{(j+1)}(x) - V^{(j)}(x)| \le \epsilon, \forall x \in \Omega$}
+\State \textbf{输出:} 近似最优控制 $u^{(j)}(x)$.
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{局限性分析}
+尽管该算法在理论上收敛 ($V^{(i)} \to V^*, u^{(i)} \to u^*$)，但在实际应用中存在两个主要问题：
+\begin{enumerate}
+    \item \textbf{离线实施:} 每次迭代都需要求解偏微分方程，计算量大，难以实时应用。
+    \item \textbf{初始条件限制:} 必须预先已知一个\textit{容许控制} (Admissible Control)，即能使系统稳定且代价有限的初始策略。这在复杂系统中往往很难获得。
+\end{enumerate}
+
+\section{基于神经网络的在线控制设计}
+
+为了解决上述问题，文献提出利用单层神经网络在\textbf{紧集} (Compact Set) $\Omega$ 上逼近价值函数。
+
+\subsection{神经网络逼近原理}
+根据万能逼近定理，最优价值函数 $V^*(x)$ 可表示为：
+\begin{equation}
+    V^*(x) = W_c\trans \sigma(x) + \varepsilon(x)
+    \label{eq:nn_approx}
+\end{equation}
+其中：
+\begin{itemize}
+    \item $W_c \in \R^{N_0}$: 理想权重向量 (未知)。
+    \item $\sigma(x)$: 激活函数向量 (基函数)，满足 $\sigma_j \in C^1(\Omega)$ 且线性无关。
+    \item $\varepsilon(x)$: 重构误差。
+\end{itemize}
+
+\textbf{注：} 此处采用 $W^T \sigma(x)$ 而非 $\sigma(Wx)$ 的结构，是为了使输出关于权重 $W_c$ 呈线性关系，便于设计自适应更新律并证明稳定性。
+
+\subsection{HJB 方程的近似求解}
+将式 (\ref{eq:nn_approx}) 的梯度 $\nabla V^*_x = \nabla \sigma\trans(x) W_c + \nabla \varepsilon$ 代入 HJB 方程，并利用中值定理处理非线性项，得到含误差项的近似方程：
+\begin{equation}
+    d_M^2(x) + x\trans Q x + W_c\trans \nabla \sigma f(x) + \kappa^2 \sum \ln(1-\tanh^2(\lambda_i)) + \varepsilon_{HJB} = 0
+\end{equation}
+其中 $\varepsilon_{HJB}$ 为 HJB 逼近误差。文献指出，随着神经元数量 $N_0$ 增加，$\varepsilon_{HJB} \to 0$。
+
+\subsection{实际控制律设计}
+由于理想权重 $W_c$ 未知，我们构建估计权重 $\hat{W}_c$，定义近似价值函数：
+\begin{equation}
+    \hat{V}(x) = \hat{W}_c\trans \sigma(x)
+\end{equation}
+进而得到可实施的控制律：
+\begin{equation}
+    \hat{u}(x) = -\kappa \tanh \left( \frac{1}{2\kappa} g\trans(x) \nabla \sigma\trans(x) \hat{W}_c \right)
+\end{equation}
+通过设计适当的权重更新律 (如基于梯度下降或李雅普诺夫方法)，可使 $\hat{W}_c \to W_c$，从而实现系统的在线最优控制。
+
+\section{总结与思考}
+\begin{itemize}
+    \item \textbf{核心贡献}: 提出了一种无需初始容许控制的在线算法，克服了传统策略迭代的局限性。
+    \item \textbf{数学基础}: 巧妙利用了紧集上的神经网络线性参数化形式 ($W^T \sigma(x)$)，平衡了逼近能力与算法的可实现性。
+    \item \textbf{未来方向}: 可以进一步研究如何自动确定紧集 $\Omega$ 的范围，以及在更高维状态空间下的计算效率问题。
+\end{itemize}
+
+\begin{thebibliography}{99}
+    \bibitem{ref1} Author Name, "Title of the Paper," Journal Name, Year. (此处填入原文献信息)
+    \bibitem{ref2} Lewis, F. L., et al. "Reinforcement Learning and Approximate Dynamic Programming for Feedback Control." Wiley, 2012.
+\end{thebibliography}
+
+\end{document}

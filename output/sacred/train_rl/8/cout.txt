@@ -1,0 +1,6 @@
+INFO - train_rl - Running command 'train_rl'
+INFO - train_rl - Started run with ID "8"
+INFO - imitation.scripts.ingredients.logging - Logging to /home/qu/f-IRL/output/train_rl/AntFH-v0/20260402_133458_65e046
+INFO - root - Wrapped env in reward RewardNet_normalized from /home/qu/f-IRL/logs/AntFH-v0/exp-16/airl_imitation/3/checkpoints/final/reward_train.pt.
+/home/qu/f-IRL/imitation/scripts/train_rl.py:137: RuntimeWarning: Applying normalization to already normalized reward function.                     Consider setting normalize_reward as False
+  warnings.warn(

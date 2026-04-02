@@ -1,0 +1,81 @@
+{
+  "agent_path": null,
+  "environment": {
+    "env_make_kwargs": {},
+    "gym_id": "AntFH-v0",
+    "max_episode_steps": null,
+    "num_vec": 8,
+    "parallel": true
+  },
+  "load_reward_kwargs": {},
+  "logging": {
+    "log_dir": {
+      "py/reduce": [
+        {
+          "py/type": "pathlib.PosixPath"
+        },
+        {
+          "py/tuple": [
+            "/",
+            "home",
+            "qu",
+            "f-IRL",
+            "output",
+            "train_rl",
+            "AntFH-v0",
+            "20260402_133655_de5c43"
+          ]
+        }
+      ]
+    },
+    "log_format_strs": [
+      "tensorboard",
+      "stdout"
+    ],
+    "log_format_strs_additional": {},
+    "log_level": 20,
+    "log_root": null,
+    "wandb": {
+      "wandb_additional_info": {},
+      "wandb_kwargs": {
+        "monitor_gym": false,
+        "project": "imitation",
+        "save_code": false
+      },
+      "wandb_name_prefix": "",
+      "wandb_tag": null
+    }
+  },
+  "normalize_kwargs": {},
+  "normalize_reward": true,
+  "policy": {
+    "policy_cls": {
+      "py/type": "imitation.policies.base.FeedForward32Policy"
+    },
+    "policy_kwargs": {}
+  },
+  "policy_evaluation": {
+    "n_episodes_eval": 50
+  },
+  "policy_save_final": true,
+  "policy_save_interval": 10000,
+  "reward_path": "/home/qu/f-IRL/logs/AntFH-v0/exp-16/airl_imitation/3/checkpoints/final/reward_train.pt",
+  "reward_type": "RewardNet_normalized",
+  "rl": {
+    "batch_size": 2048,
+    "rl_cls": {
+      "py/type": "stable_baselines3.ppo.ppo.PPO"
+    },
+    "rl_kwargs": {
+      "batch_size": 64,
+      "ent_coef": 0.0,
+      "learning_rate": 0.0003,
+      "n_epochs": 10
+    }
+  },
+  "rollout_save_final": true,
+  "rollout_save_n_episodes": null,
+  "rollout_save_n_timesteps": 2000,
+  "seed": 476143451,
+  "total_timesteps": 3000000
+}

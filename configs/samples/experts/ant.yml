@@ -5,7 +5,7 @@ env:
   T: 1000
   state_indices: all
 sac:
-  epochs: 3000
+  epochs: 1000
   log_step_interval: 5000
   update_every: 50
   update_num: 1

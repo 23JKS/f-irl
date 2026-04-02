@@ -1,0 +1,26 @@
+seed: 1
+cuda: 0
+
+env:
+  env_name: HopperFH-v0
+  T: 1000
+
+reward:
+  pretrained: logs/HopperFH-v0/exp-16/airl_imitation/3/model/reward_model_itr420_det3593_sto3579.pkl
+
+# 对齐 airl_seals_hopper_best_hp_eval.json
+ppo:
+  n_steps: 8192       # batch_size // num_vec
+  batch_size: 512
+  n_epochs: 20
+  learning_rate: 0.0005807211840258373
+  clip_range: 0.1
+  ent_coef: 0.009709494745755033
+  gae_lambda: 0.98
+  gamma: 0.995
+  max_grad_norm: 0.9
+  vf_coef: 0.20315938606555833
+
+total_timesteps: 10000000
+eval_interval: 8192   # 每轮评估一次（每 n_steps 步）
+n_eval_episodes: 10

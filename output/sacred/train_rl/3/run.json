@@ -1,0 +1,122 @@
+{
+  "artifacts": [],
+  "command": "train_rl",
+  "experiment": {
+    "base_dir": "/home/qu/miniconda3/envs/roer/lib/python3.10/site-packages/imitation/scripts/config",
+    "dependencies": [
+      "huggingface-sb3==3.0",
+      "imitation==0.4.0",
+      "numpy==1.23.5",
+      "sacred==0.8.7",
+      "stable-baselines3==1.8.0"
+    ],
+    "mainfile": "train_rl.py",
+    "name": "train_rl",
+    "repositories": [],
+    "sources": [
+      [
+        "train_rl.py",
+        "_sources/train_rl_5642f9c0bc70bed2bf0636528594dfa9.py"
+      ],
+      [
+        "../ingredients/__init__.py",
+        "_sources/__init___287628f92ab40174590052b0895907e9.py"
+      ],
+      [
+        "../ingredients/environment.py",
+        "_sources/environment_f7e538ac405cd16aea9d7c16321df60e.py"
+      ],
+      [
+        "../ingredients/logging.py",
+        "_sources/logging_e3434de0ed79a29220b85539a95bd5ad.py"
+      ],
+      [
+        "../ingredients/policy.py",
+        "_sources/policy_cdd16472dd00071e2f1b95c843a81afd.py"
+      ],
+      [
+        "../ingredients/policy_evaluation.py",
+        "_sources/policy_evaluation_2fe49c2cba801d824a725cf851fb4fc4.py"
+      ],
+      [
+        "../ingredients/rl.py",
+        "_sources/rl_cff3ce3341383fad78ad368579dfb2b1.py"
+      ],
+      [
+        "../ingredients/wb.py",
+        "_sources/wb_69d7ec6f84b488d37521eda98d6089c9.py"
+      ]
+    ]
+  },
+  "fail_trace": [
+    "Traceback (most recent call last):\n",
+    "  File \"/home/qu/miniconda3/envs/roer/lib/python3.10/site-packages/sacred/config/captured_function.py\", line 42, in captured_function\n    result = wrapped(*args, **kwargs)\n",
+    "  File \"/home/qu/f-IRL/imitation/scripts/train_rl.py\", line 111, in train_rl\n    reward_fn = load_reward(\n",
+    "  File \"/home/qu/miniconda3/envs/roer/lib/python3.10/site-packages/imitation/rewards/serialize.py\", line 281, in load_reward\n    reward_loader = reward_registry.get(reward_type)\n",
+    "  File \"/home/qu/miniconda3/envs/roer/lib/python3.10/site-packages/imitation/util/registry.py\", line 47, in get\n    raise KeyError(f\"Key '{key}' is not registered.\")\n",
+    "KeyError: \"Key '/home/qu/f-IRL/logs/AntFH-v0/exp-16/airl_imitation/3/checkpoints/final/reward_train.pt' is not registered.\"\n"
+  ],
+  "heartbeat": "2026-04-02T05:24:25.469390",
+  "host": {
+    "ENV": {},
+    "cpu": "11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz",
+    "hostname": "huawei",
+    "os": [
+      "Linux",
+      "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+    ],
+    "python_version": "3.10.19"
+  },
+  "meta": {
+    "command": "train_rl",
+    "config_updates": {
+      "environment": {
+        "gym_id": "AntFH-v0"
+      },
+      "normalize_reward": true,
+      "policy_save_final": true,
+      "reward_type": "/home/qu/f-IRL/logs/AntFH-v0/exp-16/airl_imitation/3/checkpoints/final/reward_train.pt",
+      "rollout_save_final": true,
+      "total_timesteps": 3000000
+    },
+    "named_configs": [],
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--id": null,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": null,
+      "UPDATE": [
+        "total_timesteps=3000000",
+        "reward_type=/home/qu/f-IRL/logs/AntFH-v0/exp-16/airl_imitation/3/checkpoints/final/reward_train.pt",
+        "normalize_reward=True",
+        "rollout_save_final=True",
+        "policy_save_final=True",
+        "environment.gym_id=AntFH-v0"
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": null,
+  "start_time": "2026-04-02T05:24:14.772829",
+  "status": "FAILED",
+  "stop_time": "2026-04-02T05:24:25.471424"
+}

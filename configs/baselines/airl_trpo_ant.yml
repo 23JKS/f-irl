@@ -1,0 +1,48 @@
+obj: airl_trpo
+IS: false
+seed: 1
+cuda: -1
+env:
+  env_name: HopperFH-v0
+  T: 1000
+  state_indices: all
+irl:
+  training_trajs: 32
+  n_itrs: 1000  # 对齐官方：总迭代次数
+  save_interval: 0
+  eval_episodes: 20
+  expert_episodes: 16
+  resample_episodes: 10
+# TRPO-specific parameters (对齐官方实现)
+trpo:
+  hidden_sizes: [64, 64]  # 对齐官方
+  max_kl: 0.01
+  damping: 0.1
+  gamma: 0.99  # 对齐官方：discount
+  lam: 0.97
+  vf_lr: 0.001
+  vf_iters: 20
+  entropy_weight: 0.1  # 对齐官方：熵正则化
+  use_linear_baseline: false  # 使用线性baseline，更稳定
+# AIRL training parameters (对齐官方实现)
+adv_irl:
+  normalize: true
+  batch_size: 10000  # 对齐官方：每次迭代收集的步数
+  max_path_length: 1000  # 对齐官方：每条轨迹最大长度
+  max_disc_itrs: 1  # 对齐官方：判别器每次fit的迭代次数
+  disc_optim_batch_size: 256
+  disc_lr: 0.001  # 对齐官方：lr=1e-3
+  disc_momentum: 0.0
+  gamma: 0.99
+  state_only: true  # 对齐官方：只依赖状态的奖励
+  fusion: true                  # 开启 fusion
+  fusion_buf_size: 100          # 历史 buffer 保留最近 100 条轨迹
+  fusion_subsample_ratio: 0.5   # 历史数据占比 50%
+  reward_scale: 1.0  # 奖励缩放系数
+  disc:
+    model_type: mlp_disc
+    num_layer_blocks: 2
+    hid_dim: 128
+    hid_act: tanh
+    use_bn: false
+    clamp_magnitude: 10.0

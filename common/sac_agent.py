@@ -64,7 +64,7 @@ class SquashedGaussianMLPActor(nn.Module):
         pi_distribution = Normal(mu, std)
         # 20210306: fix this bug for reversal operation on action. 
         # this may improve AIRL results, leaving for future work.
-        act = act / self.act_limit
+        act = torch.clamp(act / self.act_limit, -0.999, 0.999)
         act = torch.atanh(act) # arctanh to project [-1,1] to real
 
         logp_pi = pi_distribution.log_prob(act).sum(axis=-1)

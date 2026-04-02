@@ -1,0 +1,135 @@
+# 多源 AIRL（Ant 断腿迁移设定，与 firl_ant_transfer_multisource 源任务一致）
+# sac / adv_irl / reward / disc / critic 与 configs/samples/agents/ant.yml 对齐；
+# 多源脚本额外使用：airl_rew_shaping, gamma, num_initial_disc_iters, source_envs。
+# 说明：main_samples_multisource_airl.py 内 reward_scale 固定为 1.0（与 AdvSMM AIRL 分支一致），
+# 此处 adv_irl.reward_scale 仅作文档，与 ant.yml 保持相同数值。
+# 训练轮数由 adv_irl.num_epochs 决定（与 main_samples.py + AdvSMM.train 一致）；
+# irl.n_itrs 仅在未配置 num_epochs 时作为回退。
+#
+# 运行:
+#   export PYTHONPATH=${PWD}:$PYTHONPATH
+#   python baselines/main_samples_multisource_airl.py configs/baselines/airl_ant_transfer_multisource.yml
+#
+# 专家: 每源优先 {env}_airl.pt，否则 states/actions 的 {env}_1_det.pt（train_expert 输出）
+# 产出: model/best_reward_model.pkl, best_value_model.pkl, best_airl_bundle.pt（迁移需 reward+value）
+
+obj: airl
+IS: false
+seed: 1
+cuda: -1
+
+source_envs:
+  - AntLeg12Disabled-v0
+  - AntLeg03Disabled-v0
+
+# target_env 仅作文档说明（本脚本不训练目标环境）
+target_env: AntLeg02Disabled-v0
+
+env:
+  env_name: AntLeg12Disabled-v0
+  T: 1000
+  state_indices: all
+
+irl:
+  training_trajs: 32
+  n_itrs: 700
+  save_interval: 0
+  eval_episodes: 20
+  expert_episodes: 16
+  resample_episodes: 10
+  # n_itrs: 仅当 adv_irl 未写 num_epochs 时作为外层轮数回退；已配置 num_epochs 时忽略
+
+sac:
+  k: 1
+  epochs: 5
+  log_step_interval: 5000
+  update_every: 1
+  random_explore_episodes: 1
+  update_num: 1
+  batch_size: 100
+  lr: 0.001
+  alpha: 0.2
+  automatic_alpha_tuning: false
+  buffer_size: 1000000
+  num_test_episodes: 10
+  reinitialize: false
+  roer:
+    lambda_: 0.01
+    beta: 2
+    clip_min: 10.0
+    clip_max: 100.0
+  gumbel_max_clip: 7.0
+
+# 占位：与单源 yml 结构兼容（多源 AIRL 训练主逻辑不读 MLPReward）
+reward:
+  use_bn: false
+  residual: false
+  hid_act: relu
+  hidden_sizes: [128, 128]
+  clamp_magnitude: 10
+  lr: 0.0001
+  weight_decay: 1e-3
+  gradient_step: 1
+  momentum: 0.9
+  anchor_lambda: 0.05
+
+disc:
+  reinit: false
+  model_type: resnet_disc
+  num_layer_blocks: 6
+  hid_dim: 128
+  hid_act: tanh
+  use_bn: false
+  clamp_magnitude: 5.0
+  batch_size: 800
+  lr: 0.0003
+  weight_decay: 0.0001
+  momentum: 0.9
+  iter: 500
+  grad_pen_weight: 4.0
+
+critic:
+  lam: 0.5
+  model_type: resnet_disc
+  num_layer_blocks: 3
+  hid_dim: 128
+  hid_act: tanh
+  use_bn: false
+  batch_size: 800
+  lr: 0.0003
+  weight_decay: 0.0001
+  momentum: 0.0
+  iter: 1200
+
+adv_irl:
+  normalize: true
+  airl_rew_shaping: true
+  gamma: 0.99
+  num_initial_disc_iters: 100
+  num_epochs: 700
+  # 每个源环境每 epoch 采集的步数 = env_T * sac.epochs = 1000 * 5 = 5000
+  # 与单源 AdvSMM 节奏对齐：每源每 epoch 5000 步，2 源合计 10000 步/epoch
+  # 注意：不要设成 100000，那是单源 100 epoch 的总量，多源下会导致 buffer 被随机数据覆盖
+  num_steps_per_epoch: 5000
+  num_steps_between_train_calls: 1000
+  min_steps_before_training: 5000
+  num_update_loops_per_train_call: 100
+  num_disc_updates_per_loop_iter: 1
+  num_policy_updates_per_loop_iter: 1
+  disc_optim_batch_size: 256
+  policy_optim_batch_size: 256
+  disc_lr: 0.0003
+  disc_momentum: 0.0
+  use_grad_pen: true
+  grad_pen_weight: 4.0
+  reward_scale: 0.2
+  save_interval: 0
+  eval_interval: 200
+  replay_buffer_size: 200000
+  disc:
+    model_type: mlp_disc
+    num_layer_blocks: 2
+    hid_dim: 128
+    hid_act: tanh
+    use_bn: false
+    clamp_magnitude: 10.0

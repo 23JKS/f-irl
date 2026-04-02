@@ -31,20 +31,28 @@ class MujocoFH(gym.Env):
         self.t += 1
 
         if self.terminated:
-            return self.terminal_state, 0, self.t == self.T, True
+            return self.terminal_state, 0, self.t == self.T, {}
         else:
             prev_obs = self.obs.copy()
             self.obs, r, done, info = self.env.step(action)
             self.obs = self.normalize_obs(self.obs)
             
-            if self.r is not None:  # from irl model
-                r = self.r(prev_obs)
+            if self.r is not None:
+                try:
+                    r = self.r(prev_obs, action, self.obs.copy())
+                except TypeError:
+                    try:
+                        r = self.r(prev_obs, self.obs.copy())
+                    except TypeError:
+                        r = self.r(prev_obs)
 
             if done:
                 self.terminated = True
                 self.terminal_state = self.obs
-            
-            return self.obs.copy(), r, done, done
+            # 固定1000步（跑ppo） 
+            return self.obs.copy(), r, self.t == self.T, info
+            # 不固定
+            # return self.obs.copy(), r, done or (self.t == self.T), info
     
     def normalize_obs(self, obs):
         if self.obs_mean is not None:

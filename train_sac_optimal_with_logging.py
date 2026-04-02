@@ -145,8 +145,8 @@ if __name__ == "__main__":
     system.reproduce(seed)
     pid = os.getpid()
 
-    # environment
-    env_fn = lambda: gym.make(env_name)
+    # environment（与 train_sac_trairl_transfer 一致：构造 SAC 时也带 T，避免 CustomAnt 等默认 horizon 与 max_ep_len 不一致）
+    env_fn = lambda: gym.make(env_name, T=env_T)
     gym_env = env_fn()
     state_size = gym_env.observation_space.shape[0]
     action_size = gym_env.action_space.shape[0]
@@ -212,6 +212,7 @@ if __name__ == "__main__":
         max_ep_len=env_T,
         seed=seed,
         start_steps=env_T * v['sac']['random_explore_episodes'],
+        reward_state_indices=state_indices,
         device=device,
         **v['sac']
     )

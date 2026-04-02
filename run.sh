@@ -20,5 +20,4 @@ export PYTHONPATH=${PWD}:$PYTHONPATH
 # python baselines/bc.py configs/samples/agents/hopper.yml
 # python baselines/main_samples.py configs/samples/agents/hopper.yml
 
-
 python firl/irl_samples.py configs/samples/agents/hopper.yml

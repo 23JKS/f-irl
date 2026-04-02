@@ -1,0 +1,34 @@
+seed: 1
+cuda: 0
+
+env:
+  env_name: AntFH-v0
+  T: 1000
+
+reward:
+  pretrained: /home/qu/f-IRL/logs/AntFH-v0/exp-16/airl_imitation/3/checkpoints/final/reward_train.pt
+
+# 对齐 imitation/scripts/config/train_rl.py seals_ant named config
+# n_steps = batch_size(2048) // num_vec(1) = 2048
+# normalize_reward=True: 用 VecNormalize 对奖励归一化（对齐 train_rl 默认行为）
+policy:
+  activation: Tanh     # 对齐 seals_ant activation_fn=Tanh
+  net_arch: [64, 64]   # train_ppo_airl_with_logging.py 已硬编码 NormalizeFeaturesExtractor+RunningNorm
+
+ppo:
+  n_steps: 2048        # = rl.batch_size(8192) // num_vec(4)，或 2048 // 1
+  batch_size: 16       # PPO minibatch size，对齐 rl_kwargs.batch_size
+  n_epochs: 10
+  learning_rate: 3.249429831179079e-5   # 对齐 airl_seals_ant_best_hp_eval.json
+  clip_range: 0.3
+  ent_coef: 3.27750078482474e-6         # 对齐 airl_seals_ant_best_hp_eval.json
+  gae_lambda: 0.8
+  gamma: 0.995
+  max_grad_norm: 0.9
+  vf_coef: 0.4351450387648799
+
+normalize_reward: true   # 用 VecNormalize 归一化奖励，对齐 train_rl 默认 normalize_reward=True
+
+total_timesteps: 10000000
+eval_interval: 8192
+n_eval_episodes: 50    # 对齐 policy_evaluation.n_episodes_eval=50

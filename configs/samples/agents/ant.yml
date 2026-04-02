@@ -1,6 +1,6 @@
-obj: fkl
+obj: airl
 IS: false
-seed: 42
+seed: 1
 cuda: -1
 env:
   env_name: AntFH-v0
@@ -35,14 +35,14 @@ sac:
   reinitialize: false
   # pretrained: logs/AntFH-v0/exp-16/fkl/1/2026_03_05_09_13_01/model/policy_model_itr201_det5274_sto4133.pkl
  # ROER 参数（可选，如果不存在则使用默认值）
-  roer:
-    lambda_: 0.01      # ROER 平滑参数 λ，范围通常 [0, 1]
-    beta: 2     # KL 温度 β，控制 TD error 的缩放
-    clip_min: 10.0      # 优先级下界，防止优先级过小
-    clip_max: 100.0     # 优先级上界，防止优先级过大
-  # Gumbel rescale loss 参数（用于后 20% 迭代的 V 网络训练）
-  # 注意：gumbel_alpha 使用 roer.beta 的值，不需要单独设置
-  gumbel_max_clip: 7.0  # Gumbel rescale loss 的 clip 值
+  # roer:
+  #   lambda_: 0.01      # ROER 平滑参数 λ，范围通常 [0, 1]
+  #   beta: 2     # KL 温度 β，控制 TD error 的缩放
+  #   clip_min: 10.0      # 优先级下界，防止优先级过小
+  #   clip_max: 100.0     # 优先级上界，防止优先级过大
+  # # Gumbel rescale loss 参数（用于后 20% 迭代的 V 网络训练）
+  # # 注意：gumbel_alpha 使用 roer.beta 的值，不需要单独设置
+  # gumbel_max_clip: 7.0  # Gumbel rescale loss 的 clip 值
 reward:
   use_bn: false
   residual: false
@@ -84,20 +84,20 @@ critic:
   iter: 1200
 adv_irl: # https://github.com/KamyarGh/rl_swiss/blob/master/exp_specs/adv_irl.yaml
   normalize: true
-  num_epochs: 100
+  num_epochs: 500 
   num_steps_per_epoch: 100000
   num_steps_between_train_calls: 1000
   min_steps_before_training: 5000
   num_update_loops_per_train_call: 100
   num_disc_updates_per_loop_iter: 1
-  num_policy_updates_per_loop_iter: 1
+  num_policy_updates_per_loop_iter: 5
   disc_optim_batch_size: 256
   policy_optim_batch_size: 256
   disc_lr: 0.0003
   disc_momentum: 0.0
-  use_grad_pen: true
+  use_grad_pen: false
   grad_pen_weight: 4.0  # [2.0, 4.0, 8.0, 16.0]
-  reward_scale: 0.2  # [2.0, 4.0, 8.0, 16.0]
+  reward_scale: 2  # [2.0, 4.0, 8.0, 16.0]
   save_interval: 0
   eval_interval: 200
   replay_buffer_size: 200000

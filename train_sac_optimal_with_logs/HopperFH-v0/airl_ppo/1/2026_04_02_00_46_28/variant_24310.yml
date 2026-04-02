@@ -1,0 +1,33 @@
+seed: 1
+cuda: 0
+
+env:
+  env_name: HopperFH-v0
+  T: 1000
+
+reward:
+  pretrained: logs/HopperFH-v0/exp-16/airl_imitation/3/model/reward_model_itr420_det3593_sto3579.pkl
+
+# 对齐 imitation/scripts/config/tuned_hps/airl_seals_hopper_best_hp_eval.json
+# n_steps = rl.batch_size(8192) // num_vec(1) = 8192
+policy:
+  activation: ReLU     # 对齐 airl_seals_hopper activation_fn=ReLU
+  net_arch: [64, 64]
+
+ppo:
+  n_steps: 8192
+  batch_size: 512
+  n_epochs: 20
+  learning_rate: 0.0005807211840258373
+  clip_range: 0.1
+  ent_coef: 0.009709494745755033
+  gae_lambda: 0.98
+  gamma: 0.995
+  max_grad_norm: 0.9
+  vf_coef: 0.20315938606555833
+
+normalize_reward: true
+
+total_timesteps: 10000000
+eval_interval: 8192
+n_eval_episodes: 10

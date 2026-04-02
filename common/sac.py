@@ -321,6 +321,7 @@ class SAC:
         self.q_optimizer.zero_grad()
         loss_q = self.compute_loss_q(data)
         loss_q.backward()
+        torch.nn.utils.clip_grad_norm_(self.q_params, 10.0)
         self.q_optimizer.step()
 
         # Freeze Q-networks so you don't waste computational effort 
@@ -332,6 +333,7 @@ class SAC:
         self.pi_optimizer.zero_grad()
         loss_pi, log_pi = self.compute_loss_pi(data)
         loss_pi.backward()
+        torch.nn.utils.clip_grad_norm_(self.ac.pi.parameters(), 10.0)
         self.pi_optimizer.step()
 
         if self.automatic_alpha_tuning:

@@ -1,0 +1,53 @@
+# 使用多源 AIRL 保存的 checkpoint 在目标环境上训 SAC（与 train_sac_optimal_with_logging 平行）
+#
+# 运行:
+#   export PYTHONPATH=${PWD}:$PYTHONPATH
+#   python train_sac_airl_transfer.py configs/baselines/sac_airl_transfer_ant.yml
+#
+# 将 airl.bundle 改为你的 run 目录下 model/best_airl_bundle.pt
+
+seed: 1
+cuda: -1
+
+env:
+  env_name: AntLeg02Disabled-v0
+  T: 1000
+  state_indices: all
+
+# 与训练 AIRL 时的 adv_irl.disc 结构必须一致
+adv_irl:
+  disc:
+    model_type: mlp_disc
+    num_layer_blocks: 2
+    hid_dim: 256
+    hid_act: relu
+    use_bn: false
+    clamp_magnitude: false
+
+airl:
+  # 必填其一：bundle 为 null 且未写 reward_model/value_model 时会直接报错。
+  # 把下面改成你的一次 main_samples_multisource_airl 运行目录，例如：
+  #   logs/multi_2src_AntLeg12Disabled-v0/exp-16/airl-multisource/1/2026_xx_xx/model/best_airl_bundle.pt
+  bundle: null
+  airl_rew_shaping: false
+  # 不用 bundle 时取消注释并填路径：
+  # reward_model: /abs/path/best_reward_model.pkl
+  # value_model: /abs/path/best_value_model.pklw
+  # gamma: 0.99
+  # airl_rew_shaping: true
+  # reward_scale: 1.0
+
+sac:
+  reinitialize: true
+  k: 1
+  epochs: 3000
+  log_step_interval: 5000
+  update_every: 1
+  random_explore_episodes: 1
+  update_num: 1
+  batch_size: 100
+  lr: 0.001
+  alpha: 0.2
+  automatic_alpha_tuning: false
+  buffer_size: 1000000
+  num_test_episodes: 10

@@ -1,0 +1,167 @@
+{
+  "agent_path": null,
+  "algorithm_kwargs": {
+    "allow_variable_horizon": true,
+    "demo_batch_size": 2048,
+    "gen_replay_buffer_capacity": 8192,
+    "n_disc_updates_per_round": 16
+  },
+  "algorithm_specific": {},
+  "checkpoint_interval": 500000,
+  "demonstrations": {
+    "__annotations__": {
+      "loader_kwargs": {
+        "py/reduce": [
+          {
+            "py/function": "_operator.getitem"
+          },
+          {
+            "py/tuple": [
+              {
+                "__doc__": "A generic version of dict.",
+                "__origin__": {
+                  "py/type": "builtins.dict"
+                },
+                "__slots__": null,
+                "_inst": false,
+                "_name": "Dict",
+                "_nparams": 2,
+                "py/object": "typing._SpecialGenericAlias"
+              },
+              {
+                "py/tuple": [
+                  {
+                    "py/type": "builtins.str"
+                  },
+                  {
+                    "_getitem": {
+                      "py/function": "typing.Any"
+                    },
+                    "_name": "Any",
+                    "py/object": "typing._SpecialForm"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "algo_name": "ppo",
+    "algorithm_specific": {},
+    "loader_kwargs": {
+      "split": "train"
+    },
+    "n_expert_demos": 16,
+    "organization": "HumanCompatibleAI",
+    "path": "expert_data/imitation/HopperFH-v0_1_det_trajs.pkl",
+    "source": "local"
+  },
+  "environment": {
+    "algorithm_specific": {},
+    "env_make_kwargs": {},
+    "gym_id": "HopperFH-v0",
+    "max_episode_steps": null,
+    "num_vec": 1,
+    "parallel": false
+  },
+  "expert": {
+    "algorithm_specific": {},
+    "loader_kwargs": {
+      "env_name": "HopperFH-v0",
+      "organization": "HumanCompatibleAI"
+    },
+    "policy_type": "ppo-huggingface"
+  },
+  "logging": {
+    "algorithm_specific": {},
+    "log_dir": "logs/HopperFH-v0/exp-16/airl_imitation/4",
+    "log_format_strs": [
+      "tensorboard",
+      "stdout"
+    ],
+    "log_format_strs_additional": {},
+    "log_level": 20,
+    "log_root": null,
+    "wandb": {
+      "wandb_additional_info": {},
+      "wandb_kwargs": {
+        "monitor_gym": false,
+        "project": "imitation",
+        "save_code": false
+      },
+      "wandb_name_prefix": "",
+      "wandb_tag": null
+    }
+  },
+  "policy": {
+    "policy_cls": "MlpPolicy",
+    "policy_kwargs": {
+      "activation_fn": {
+        "py/type": "torch.nn.modules.activation.ReLU"
+      },
+      "features_extractor_class": {
+        "py/type": "imitation.policies.base.NormalizeFeaturesExtractor"
+      },
+      "features_extractor_kwargs": {
+        "normalize_class": {
+          "py/type": "imitation.util.networks.RunningNorm"
+        }
+      },
+      "net_arch": [
+        {
+          "pi": [
+            64,
+            64
+          ],
+          "vf": [
+            64,
+            64
+          ]
+        }
+      ]
+    }
+  },
+  "policy_evaluation": {
+    "algorithm_specific": {},
+    "n_episodes_eval": 50
+  },
+  "reward": {
+    "add_std_alpha": null,
+    "algorithm_specific": {},
+    "ensemble_member_config": {},
+    "ensemble_size": null,
+    "net_cls": {
+      "py/type": "imitation.rewards.reward_nets.BasicShapedRewardNet"
+    },
+    "net_kwargs": {
+      "normalize_input_layer": {
+        "py/type": "imitation.util.networks.RunningNorm"
+      }
+    },
+    "normalize_output_layer": {
+      "py/type": "imitation.util.networks.RunningNorm"
+    }
+  },
+  "rl": {
+    "algorithm_specific": {},
+    "batch_size": 8192,
+    "rl_cls": {
+      "py/type": "stable_baselines3.ppo.ppo.PPO"
+    },
+    "rl_kwargs": {
+      "batch_size": 512,
+      "clip_range": 0.1,
+      "ent_coef": 0.009709494745755033,
+      "gae_lambda": 0.98,
+      "gamma": 0.995,
+      "learning_rate": 0.0005807211840258373,
+      "max_grad_norm": 0.9,
+      "n_epochs": 20,
+      "vf_coef": 0.20315938606555833
+    }
+  },
+  "seed": 1,
+  "show_config": false,
+  "total_timesteps": 10000000
+}

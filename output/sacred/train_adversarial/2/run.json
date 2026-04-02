@@ -1,0 +1,193 @@
+{
+  "artifacts": [],
+  "command": "airl",
+  "experiment": {
+    "base_dir": "/home/qu/f-IRL/imitation/scripts/config",
+    "dependencies": [
+      "datasets==4.8.4",
+      "huggingface-sb3==3.0",
+      "imitation==0.4.0",
+      "numpy==1.23.5",
+      "sacred==0.8.7",
+      "stable-baselines3==1.8.0"
+    ],
+    "mainfile": "train_adversarial.py",
+    "name": "train_adversarial",
+    "repositories": [
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      },
+      {
+        "commit": "65a2c349c5f4c6f08892b0ee20a9260e55b442ff",
+        "dirty": true,
+        "url": "https://github.com/23JKS/f-irl.git"
+      }
+    ],
+    "sources": [
+      [
+        "train_adversarial.py",
+        "_sources/train_adversarial_d9c38bfafb6e3d60fef07b6a7dc3df8a.py"
+      ],
+      [
+        "../ingredients/__init__.py",
+        "_sources/__init___287628f92ab40174590052b0895907e9.py"
+      ],
+      [
+        "../ingredients/demonstrations.py",
+        "_sources/demonstrations_648e43b22cbf58ee26f064ded7a0db06.py"
+      ],
+      [
+        "../ingredients/environment.py",
+        "_sources/environment_f7e538ac405cd16aea9d7c16321df60e.py"
+      ],
+      [
+        "../ingredients/expert.py",
+        "_sources/expert_fed1b62fbd609ccecb288bd49910bbcf.py"
+      ],
+      [
+        "../ingredients/logging.py",
+        "_sources/logging_e3434de0ed79a29220b85539a95bd5ad.py"
+      ],
+      [
+        "../ingredients/policy.py",
+        "_sources/policy_cdd16472dd00071e2f1b95c843a81afd.py"
+      ],
+      [
+        "../ingredients/policy_evaluation.py",
+        "_sources/policy_evaluation_2fe49c2cba801d824a725cf851fb4fc4.py"
+      ],
+      [
+        "../ingredients/reward.py",
+        "_sources/reward_47d587e21f7b70c2b2fc392b57ddd784.py"
+      ],
+      [
+        "../ingredients/rl.py",
+        "_sources/rl_070a71113d5f26a0d45d00037e05fad1.py"
+      ],
+      [
+        "../ingredients/wb.py",
+        "_sources/wb_69d7ec6f84b488d37521eda98d6089c9.py"
+      ]
+    ]
+  },
+  "heartbeat": "2026-04-02T09:29:19.523985",
+  "host": {
+    "ENV": {},
+    "cpu": "11th Gen Intel(R) Core(TM) i7-1195G7 @ 2.90GHz",
+    "hostname": "huawei",
+    "os": [
+      "Linux",
+      "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39"
+    ],
+    "python_version": "3.10.19"
+  },
+  "meta": {
+    "command": "airl",
+    "config_updates": {
+      "demonstrations": {
+        "n_expert_demos": 16,
+        "path": "expert_data/imitation/AntFH-v0_airl_trajs.pkl",
+        "source": "local"
+      },
+      "environment": {
+        "gym_id": "AntFH-v0",
+        "num_vec": 1,
+        "parallel": false
+      },
+      "logging": {
+        "log_dir": "logs/AntFH-v0/exp-16/airl_imitation/4"
+      },
+      "seed": 1
+    },
+    "named_configs": [
+      "airl_seals_ant"
+    ],
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--id": null,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": "airl",
+      "UPDATE": [
+        "airl_seals_ant",
+        "environment.gym_id=AntFH-v0",
+        "environment.parallel=False",
+        "environment.num_vec=1",
+        "seed=1",
+        "demonstrations.source=local",
+        "demonstrations.path=expert_data/imitation/AntFH-v0_airl_trajs.pkl",
+        "demonstrations.n_expert_demos=16",
+        "logging.log_dir=logs/AntFH-v0/exp-16/airl_imitation/4"
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": null,
+  "start_time": "2026-04-02T08:05:37.214322",
+  "status": "RUNNING"
+}

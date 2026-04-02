@@ -245,16 +245,36 @@ class CustomAntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         disabled_action_ratio=0.3,
         lock_disabled_legs=False,
         T=None,
+        obs_mean=None,
+        obs_std=None,
     ):
         if T is not None:
             max_timesteps = int(T)
+        assert (obs_mean is None and obs_std is None) or (
+            obs_mean is not None and obs_std is not None
+        )
+        self.obs_mean = (
+            np.asarray(obs_mean, dtype=np.float32) if obs_mean is not None else None
+        )
+        self.obs_std = (
+            np.asarray(obs_std, dtype=np.float32) if obs_std is not None else None
+        )
         #mujoco_env.MujocoEnv.__init__(self, 'ant.xml', 5)
-        utils.EzPickle.__init__(self, max_timesteps=max_timesteps, r=r, disabled=disabled,
-                                disabled_legs=disabled_legs, gear=gear,
-                                disabled_gear_ratio=disabled_gear_ratio,
-                                match_standard_ant=match_standard_ant,
-                                disabled_action_ratio=disabled_action_ratio,
-                                lock_disabled_legs=lock_disabled_legs, T=T)
+        utils.EzPickle.__init__(
+            self,
+            max_timesteps=max_timesteps,
+            r=r,
+            disabled=disabled,
+            disabled_legs=disabled_legs,
+            gear=gear,
+            disabled_gear_ratio=disabled_gear_ratio,
+            match_standard_ant=match_standard_ant,
+            disabled_action_ratio=disabled_action_ratio,
+            lock_disabled_legs=lock_disabled_legs,
+            T=T,
+            obs_mean=obs_mean,
+            obs_std=obs_std,
+        )
         self.timesteps = 0
         self.max_timesteps=max_timesteps
         self.T = T
@@ -281,6 +301,11 @@ class CustomAntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         with model.asfile() as f:
             mujoco_env.MujocoEnv.__init__(self, f.name, 5)
 
+    def _maybe_normalize_obs(self, ob):
+        if self.obs_mean is None:
+            return ob
+        return (ob - self.obs_mean) / self.obs_std
+
     def step(self, a):
         if self.match_standard_ant and self.disabled_legs is not None:
             a = np.array(a, dtype=np.float32, copy=True)
@@ -297,11 +322,8 @@ class CustomAntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                     else:
                         a[idx] *= self.disabled_action_ratio
 
+        obs_before = self._get_obs().copy()
         xposbefore = self.get_body_com("torso")[0]
-        if (self._get_obs is not None) and (self.r is not None):
-            reward_network = self.r(self._get_obs().copy())
-        else:
-            reward_network = 0
         self.do_simulation(a, self.frame_skip)
         xposafter = self.get_body_com("torso")[0]
         forward_reward = (xposafter - xposbefore) / self.dt
@@ -312,17 +334,24 @@ class CustomAntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         state = self.state_vector()
         healthy = np.isfinite(state).all() and (state[2] >= 0.2) and (state[2] <= 1.0)
         healthy_reward = 1.0
-        reward = forward_reward - ctrl_cost - contact_cost + healthy_reward
+        reward_env = forward_reward - ctrl_cost - contact_cost + healthy_reward
 
+        ob = self._get_obs().copy()
+        obs_before_n = self._maybe_normalize_obs(obs_before)
+        ob_n = self._maybe_normalize_obs(ob)
         if self.r is not None:
-            # print(reward_network)
-            reward = reward_network
-        # self.prev_obs = self._get_obs().copy()
+            # 双参 r(s,s')：AIRL 塑形；单参：兼容旧版/MLP 奖励（仅用转移前状态）
+            # 与 MujocoFH 一致：有 obs_mean/std 时奖励网络见归一化观测
+            try:
+                reward = self.r(obs_before_n, ob_n)
+            except TypeError:
+                reward = self.r(obs_before_n)
+        else:
+            reward = reward_env
         self.timesteps += 1
         done = (not healthy) or (self.timesteps >= self.max_timesteps)
 
-        ob = self._get_obs()
-        return ob, reward, done, dict(
+        return ob_n, reward, done, dict(
             reward_forward=forward_reward,
             reward_ctrl=-ctrl_cost,
             reward_contact=-contact_cost,
@@ -341,7 +370,7 @@ class CustomAntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         qvel = self.init_qvel + self.np_random.randn(self.model.nv) * .1
         self.set_state(qpos, qvel)
         self.prev_obs = self._get_obs().copy()
-        return self._get_obs()
+        return self._maybe_normalize_obs(self._get_obs().copy())
 
     def viewer_setup(self):
         self.viewer.cam.distance = self.model.stat.extent * 0.5
